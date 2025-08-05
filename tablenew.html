@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Records Management</title>
+    <style>
+        /* Your existing CSS styles go here */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .logo-container {
+            margin-right: 20px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #3498db;
+            padding: 10px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        
+        .logo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+            flex: 1;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        
+        .company-info {
+            margin-left: auto;
+            text-align: right;
+            color: #7f8c8d;
+        }
+        
+        .company-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .company-tagline {
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .action-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .export-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .export-btn:hover {
+            background-color: #2ecc71;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .filter-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .clear-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #e3f2fd;
+            cursor: pointer;
+        }
+        
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+        
+        .bill-link {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        
+        .bill-link:hover {
+            text-decoration: underline;
+        }
+        
+        .gst-yes {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .gst-no {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            margin: 0 5px;
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .pagination button.active {
+            background-color: #2980b9;
+            font-weight: bold;
+        }
+        
+        .pagination button:hover:not(.active) {
+            background-color: #5dade2;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 60%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            width: 150px;
+            color: #7f8c8d;
+        }
+        
+        .detail-value {
+            flex: 1;
+        }
+        
+        .bill-preview {
+            margin-top: 20px;
+            border: 1px dashed #ccc;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .bill-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 10px;
+        }
+        
+        /* Filter section styles */
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .platform-amazon { background-color: #ff9900; color: white; padding: 2px 6px; border-radius: 3px; }
+        .platform-flipkart { background-color: #2874f0; color: white; padding: 2px 6px; border-radius: 3px; }
+        .platform-marketplace { background-color: #8e44ad; color: white; padding: 2px 6px; border-radius: 3px; }
+        .platform-others { background-color: #7f8c8d; color: white; padding: 2px 6px; border-radius: 3px; }
+        
+        /* Logo upload section */
+        .logo-upload {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .logo-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .logo-upload:hover .logo {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Buyer name dropdown styles */
+        .buyer-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .buyer-suggestions.show {
+            display: block;
+        }
+        
+        .buyer-suggestion-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .buyer-suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Date range filter styles */
+        .date-range-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .date-range-group .filter-group {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-container {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .company-info {
+                margin-left: 0;
+                text-align: center;
+                margin-top: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .date-range-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo-upload" title="Click to upload logo">
+                    <input type="file" id="logoInput" accept="image/*">
+                    <!-- Change this in the header section -->
+                    <div class="logo">
+                     <img src="logob&m.jpg" alt="Bandy & Moot Logo" id="logoDisplay" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMzNDk4ZGIiLz48dGV4dCB4PSI1MCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxvZ288L3RleHQ+PC9zdmc+'">
+                    </div>
+                    
+                </div>
+            </div>
+            <h1>Purchase Records Management</h1>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="platform-filter">Platform</label>
+                    <select id="platform-filter">
+                        <option value="">All Platforms</option>
+                        <option value="Amazon">Amazon</option>
+                        <option value="Flipkart">Flipkart</option>
+                        <option value="Marketplace">Marketplace</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="buyer-filter">Buyer Name</label>
+                    <input type="text" id="buyer-filter" placeholder="Search buyer..." autocomplete="off">
+                    <div class="buyer-suggestions" id="buyer-suggestions"></div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="email-filter">Email</label>
+                    <input type="text" id="email-filter" placeholder="Search email...">
+                </div>
+                <div class="filter-group">
+                    <label for="gst-filter">GST Applicable</label>
+                    <select id="gst-filter">
+                        <option value="">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="date-range-group">
+                    <div class="filter-group">
+                        <label for="start-date-filter">Start Date</label>
+                        <input type="date" id="start-date-filter" max="">
+                    </div>
+                    <div class="filter-group">
+                        <label for="end-date-filter">End Date</label>
+                        <input type="date" id="end-date-filter" max="">
+                    </div>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="filter-btn" id="applyFilters">Search </button>
+                <button class="clear-btn" id="clearFilters">Clear Search</button>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="export-btn" id="exportBtn">Export Selected</button>
+            <button class="delete-btn" id="deleteBtn">Delete Selected</button>
+        </div>
+        
+        <table id="purchaseTable">
+            <thead>
+                <tr>
+                    <th class="checkbox-cell"><input type="checkbox" id="selectAll"></th>
+                    <th>Buyer Name</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>UnitPrice</th>
+                    <th>Total</th>
+                    <th>GrandTotal</th>
+                    <th>Platform</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>GST Applicable</th>
+                    <th>Bill</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Table rows will be populated by JavaScript from backend -->
+            </tbody>
+        </table>
+        
+        <div class="pagination">
+            <button id="prevPage">&laquo;</button>
+            <button class="active" id="page1">1</button>
+            <button id="page2">2</button>
+            <button id="page3">3</button>
+            <button id="nextPage">&raquo;</button>
+        </div>
+    </div>
+
+    <!-- Detail View Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Purchase Details</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modalBody">
+                <div class="detail-row">
+                    <div class="detail-label">Buyer Name:</div>
+                    <div class="detail-value" id="detail-buyer-name"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value" id="detail-email"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Product Name:</div>
+                    <div class="detail-value" id="detail-product-name"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Platform:</div>
+                    <div class="detail-value" id="detail-platform"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Quantity:</div>
+                    <div class="detail-value" id="detail-quantity"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Date:</div>
+                    <div class="detail-value" id="detail-date"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Time:</div>
+                    <div class="detail-value" id="detail-time"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">GST Applicable:</div>
+                    <div class="detail-value" id="detail-gst"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Total Amount:</div>
+                    <div class="detail-value" id="detail-amount"></div>
+                </div>
+                <div class="bill-preview">
+                    <div class="detail-label">Uploaded Bill:</div>
+                    <div id="detail-bill-name"></div>
+                    <div id="bill-preview-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication before loading the page
+        // If not authenticated or not admin, redirect to login
+        if (sessionStorage.getItem('isAuthenticated') !== 'true' || sessionStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        }
+           
+        // This will be populated from your backend API
+        let purchaseData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let uniqueBuyerNames = []; // This will now be fetched from the backend
+
+        // Function to fetch data from backend
+        async function fetchPurchaseData() {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (!token) {
+                    // Should be caught by initial check, but good to have a fallback
+                    window.location.href = 'loginnew.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:8000/api/purchases', {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include JWT token
+                    }
+                });
+                console.log(response);
+                // Handle unauthorized or forbidden responses (e.g., token expired, not admin)
+                if (response.status === 401 || response.status === 403) {
+                    alert('Session expired or unauthorized access. Please log in again.');
+                    sessionStorage.removeItem('isAuthenticated');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('userRole');
+                    window.location.href = 'loginnew.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch purchase data: ${response.statusText}`);
+                }
+                purchaseData = await response.json();
+                console.log(purchaseData);
+                filteredData = [...purchaseData];
+                console.log(filteredData);
+                // Convert date strings to Date objects for sorting and filtering
+                purchaseData.forEach(item => {
+                    item.dateObj = new Date(item.date);
+                });
+                
+                // Fetch unique buyer names for the filter dropdown
+                await fetchUniqueBuyerNames();
+                
+                renderTable();
+                updatePagination();
+            } catch (error) {
+                console.error('Error fetching purchase data:', error);
+                document.getElementById('tableBody').innerHTML = 
+                    '<tr><td colspan="9" class="no-records">Error loading data. Please try again later.</td></tr>';
+            }
+        }
+
+        // Function to fetch unique buyer names from the backend
+        async function fetchUniqueBuyerNames() {
+            try {
+                const token = sessionStorage.getItem('token');
+                const response = await fetch('http://localhost:8000/api/buyers', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Handle re-authentication if token is invalid/expired
+                    alert('Session expired or unauthorized. Please log in again.');
+                    sessionStorage.removeItem('isAuthenticated');
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('userRole');
+                    window.location.href = 'loginnew.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch buyer names: ${response.statusText}`);
+                }
+                uniqueBuyerNames = await response.json();
+            } catch (error) {
+                console.error('Error fetching unique buyer names:', error);
+                uniqueBuyerNames = []; // Fallback to empty array on error
+            }
+        }
+
+        // Function to show buyer name suggestions
+        function showBuyerSuggestions(searchTerm = '') {
+            const suggestionsContainer = document.getElementById('buyer-suggestions');
+            suggestionsContainer.innerHTML = '';
+            
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            const filteredNames = uniqueBuyerNames.filter(name => 
+                name.toLowerCase().includes(lowerCaseSearchTerm)
+            ).slice(0, 10); // Limit to 10 suggestions
+
+            if (filteredNames.length > 0) {
+                filteredNames.forEach(name => {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.className = 'buyer-suggestion-item';
+                    suggestionItem.textContent = name;
+                    suggestionItem.addEventListener('click', function() {
+                        document.getElementById('buyer-filter').value = name;
+                        suggestionsContainer.classList.remove('show');
+                    });
+                    suggestionsContainer.appendChild(suggestionItem);
+                });
+            } else {
+                const noResults = document.createElement('div');
+                noResults.className = 'buyer-suggestion-item';
+                noResults.textContent = 'No matching buyers found';
+                suggestionsContainer.appendChild(noResults);
+            }
+            
+            suggestionsContainer.classList.add('show');
+        }
+
+        // Function to set max date to today for date inputs
+        function setMaxDateToToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start-date-filter').max = today;
+            document.getElementById('end-date-filter').max = today;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set max date to today for date inputs
+            setMaxDateToToday();
+            
+            // Initialize by fetching data from backend
+            fetchPurchaseData();
+            
+            // Logo upload functionality
+            const logoInput = document.getElementById('logoInput');
+            const logoDisplay = document.getElementById('logoDisplay');
+            
+            logoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        logoDisplay.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Modal elements
+            const modal = document.getElementById('detailModal');
+            const closeBtn = document.querySelector('.close-btn');
+            
+            // Filter elements
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const clearFiltersBtn = document.getElementById('clearFilters');
+            const platformFilter = document.getElementById('platform-filter');
+            const startDateFilter = document.getElementById('start-date-filter');
+            const endDateFilter = document.getElementById('end-date-filter');
+            const buyerFilter = document.getElementById('buyer-filter');
+            const emailFilter = document.getElementById('email-filter');
+            const gstFilter = document.getElementById('gst-filter');
+            
+            // Buyer suggestions elements
+            const buyerSuggestions = document.getElementById('buyer-suggestions');
+            
+            // Buyer name filter event listeners
+            buyerFilter.addEventListener('focus', function() {
+                showBuyerSuggestions(this.value);
+            });
+            
+            buyerFilter.addEventListener('input', function() {
+                showBuyerSuggestions(this.value);
+            });
+            
+            buyerFilter.addEventListener('blur', function() {
+                // Hide suggestions after a small delay to allow click events to register
+                setTimeout(() => {
+                    buyerSuggestions.classList.remove('show');
+                }, 200);
+            });
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!buyerFilter.contains(e.target) && !buyerSuggestions.contains(e.target)) {
+                    buyerSuggestions.classList.remove('show');
+                }
+            });
+            
+            // Pagination elements
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+            const page1Btn = document.getElementById('page1');
+            const page2Btn = document.getElementById('page2');
+            const page3Btn = document.getElementById('page3');
+            
+            // Apply filters button click handler
+            applyFiltersBtn.addEventListener('click', function() {
+                applyFilters();
+                currentPage = 1;
+                renderTable();
+                updatePagination();
+            });
+            
+            // Clear filters button click handler
+            clearFiltersBtn.addEventListener('click', function() {
+                platformFilter.value = '';
+                startDateFilter.value = '';
+                endDateFilter.value = '';
+                buyerFilter.value = '';
+                emailFilter.value = '';
+                gstFilter.value = '';
+                filteredData = [...purchaseData]; // Reset to all data
+                currentPage = 1;
+                renderTable();
+                updatePagination();
+            });
+            
+            // Filter function
+            function applyFilters() {
+                const startDate = startDateFilter.value ? new Date(startDateFilter.value) : null;
+                const endDate = endDateFilter.value ? new Date(endDateFilter.value) : null;
+                
+                // Adjust end date to include the entire day
+                if (endDate) {
+                    endDate.setHours(23, 59, 59, 999);
+                }
+                
+                filteredData = purchaseData.filter(item => {
+                    // Platform filter
+                    if (platformFilter.value && item.platform !== platformFilter.value) {
+                        return false;
+                    }
+                    
+                    // Date range filter
+                    if (startDate && item.dateObj < startDate) {
+                        return false;
+                    }
+                    if (endDate && item.dateObj > endDate) {
+                        return false;
+                    }
+                    
+                    // Buyer name filter (case insensitive partial match)
+                    if (buyerFilter.value && !item.buyerName.toLowerCase().includes(buyerFilter.value.toLowerCase())) {
+                        return false;
+                    }
+                    
+                    // Email filter (case insensitive partial match)
+                    if (emailFilter.value && !item.email.toLowerCase().includes(emailFilter.value.toLowerCase())) {
+                        return false;
+                    }
+                    
+                    // GST filter
+                    if (gstFilter.value && item.gst !== gstFilter.value) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+            }
+            
+            // Function to render the table
+            function renderTable() {
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+                
+                // Calculate pagination
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+                const currentPageData = filteredData.slice(startIndex, endIndex);
+                
+                if (currentPageData.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="9" class="no-records">No records found matching your filters</td></tr>';
+                    return;
+                }
+                
+                currentPageData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-id', item.id); // Use item.id (which is MongoDB's _id)
+                    console.log(item);
+                    // Determine platform class for styling
+                    let platformClass = '';
+                    switch(item.platform) {
+                        case 'Amazon': platformClass = 'platform-amazon'; break;
+                        case 'Flipkart': platformClass = 'platform-flipkart'; break;
+                        case 'Marketplace': platformClass = 'platform-marketplace'; break;
+                        case 'Others': platformClass = 'platform-others'; break;
+                        default: platformClass = ''; // No specific class for unknown platforms
+                    }
+                    
+                    // row.innerHTML = `
+                    //     <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                    //     <td>${item.buyerName}</td>
+                    //     item.productName.map(product => <td>${product.productName}</td>).join('')
+                    //     <td>${item.productName[0].quantity}</td>
+                    //     <td>${item.productName[0].unitPrice}</td>
+                    //     <td><span class="${platformClass}">${item.platform}</span></td>
+                        // <td>${item.email}</td>
+                        // <td>${item.date}</td>
+                        // <td>${item.total}</td>
+                        // <td class="${item.gst === 'Yes' ? 'gst-yes' : 'gst-no'}">${item.gst}</td>
+                        // <td><a href="#" class="bill-link">${item.billType}</a></td>
+                    // `;
+                    
+                    // tableBody.appendChild(row);
+                    
+            
+            // Create a main row for the buyer
+
+            if ( item.billUpload == undefined )
+            {
+                row.innerHTML = `
+                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                <td>${item.buyerName}</td>
+                <td>${item.productName[0].productName}</td>
+                <td>${item.productName[0].quantity}</td>
+                <td>${item.productName[0].unitPrice}</td>
+                <td>${item.productName[0].totalPrice}</td>
+                <td>${item.grandTotal}</td>
+                <td><span class="${platformClass}">${item.platform}</span></td>
+                <td>${item.email}</td>
+                <td>${item.date}</td>
+                <td class="${item.gst === 'Yes' ? 'gst-yes' : 'gst-no'}">${item.gst}</td>                
+                <td>❌</td>
+            `;
+            }else
+            {
+                row.innerHTML = `
+                <td class="checkbox-cell"><input type="checkbox" class="row-checkbox"></td>
+                <td>${item.buyerName}</td>
+                <td>${item.productName[0].productName}</td>
+                <td>${item.productName[0].quantity}</td>
+                <td>${item.productName[0].unitPrice}</td>
+                <td>${item.productName[0].totalPrice}</td>
+                <td>${item.grandTotal}</td>
+                <td><span class="${platformClass}">${item.platform}</span></td>
+                <td>${item.email}</td>
+                <td>${item.date}</td>
+                <td class="${item.gst === 'Yes' ? 'gst-yes' : 'gst-no'}">${item.gst}</td>
+                <td><a href=http://localhost:8000/view/${item.billUpload.filename}>🔍</a>   <a href=http://localhost:8000/download/${item.billUpload.filename}>⬇️</a></td>`;
+            }
+           
+            console.log(item.billUpload);
+            tableBody.appendChild(row);
+            // Add additional rows for more products
+            for (let i = 1; i < item.productName.length; i++) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td></td>
+                    <td></td>
+                    <td>${item.productName[i].productName}</td>
+                    <td>${item.productName[i].quantity}</td>
+                    <td>${item.productName[i].unitPrice}</td>
+                    <td>${item.productName[i].totalPrice}</td>
+                `;
+                tableBody.appendChild(tr);
+            }
+            
+        });
+  
+
+
+                    
+                
+                
+                // Add event listeners to new rows
+                document.querySelectorAll('#tableBody tr').forEach(row => {
+                    row.addEventListener('dblclick', function() {
+                        const id = this.getAttribute('data-id'); // Get string ID
+                        showDetails(id);
+                    });
+                });
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        updateSelectAllCheckbox();
+                    });
+                });
+
+                // Ensure "Select All" checkbox state is correct after rendering
+                updateSelectAllCheckbox();
+            }
+            
+            // Function to update the "Select All" checkbox
+            function updateSelectAllCheckbox() {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                const selectAll = document.getElementById('selectAll');
+                
+                if (checkboxes.length === 0) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                    return;
+                }
+                
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount === 0) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                } else if (checkedCount === checkboxes.length) {
+                    selectAll.checked = true;
+                    selectAll.indeterminate = false;
+                } else {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = true;
+                }
+            }
+            
+            // Pagination functions
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                
+                // Hide/show pagination buttons as needed
+                prevPageBtn.style.display = currentPage > 1 ? 'block' : 'none';
+                nextPageBtn.style.display = currentPage < totalPages ? 'block' : 'none';
+                
+                // Update page buttons visibility and active state
+                const pageButtons = [page1Btn, page2Btn, page3Btn];
+                pageButtons.forEach((btn, index) => {
+                    const pageNum = index + 1;
+                    if (pageNum <= totalPages) {
+                        btn.textContent = pageNum;
+                        btn.style.display = 'block';
+                        btn.classList.remove('active');
+                        if (currentPage === pageNum) {
+                            btn.classList.add('active');
+                        }
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+
+                // Adjust page numbers if current page is beyond the initial 3
+                if (currentPage > 3 && totalPages > 3) {
+                    page1Btn.textContent = currentPage - 1;
+                    page2Btn.textContent = currentPage;
+                    page3Btn.textContent = currentPage + 1;
+
+                    page1Btn.classList.remove('active');
+                    page2Btn.classList.add('active');
+                    page3Btn.classList.remove('active');
+
+                    if (currentPage === totalPages) {
+                        page1Btn.classList.add('active');
+                        page2Btn.classList.remove('active');
+                        page3Btn.classList.remove('active');
+                        page1Btn.textContent = totalPages - 2;
+                        page2Btn.textContent = totalPages - 1;
+                        page3Btn.textContent = totalPages;
+                    } else if (currentPage === totalPages - 1) {
+                        page1Btn.classList.remove('active');
+                        page2Btn.classList.add('active');
+                        page3Btn.classList.remove('active');
+                    }
+                }
+            }
+            
+            // Pagination button handlers
+            prevPageBtn.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                    updatePagination();
+                }
+            });
+            
+            nextPageBtn.addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                    updatePagination();
+                }
+            });
+            
+            page1Btn.addEventListener('click', function() {
+                const pageNum = parseInt(this.textContent);
+                currentPage = pageNum;
+                renderTable();
+                updatePagination();
+            });
+            
+            page2Btn.addEventListener('click', function() {
+                const pageNum = parseInt(this.textContent);
+                currentPage = pageNum;
+                renderTable();
+                updatePagination();
+            });
+            
+            page3Btn.addEventListener('click', function() {
+                const pageNum = parseInt(this.textContent);
+                currentPage = pageNum;
+                renderTable();
+                updatePagination();
+            });
+            
+            // Select all checkboxes functionality
+            const selectAllCheckbox = document.getElementById('selectAll');
+            selectAllCheckbox.addEventListener('change', function() {
+                const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+            
+            // Delete selected functionality
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.addEventListener('click', async function() {
+                const selectedCheckboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+                
+                if (selectedCheckboxes.length === 0) {
+                    alert('Please select at least one record to delete.');
+                    return;
+                }
+                
+                if (confirm(`Are you sure you want to delete ${selectedCheckboxes.length} selected record(s)?`)) {
+                    const selectedIds = selectedCheckboxes.map(checkbox => 
+                        checkbox.closest('tr').getAttribute('data-id') // Get MongoDB _id as string
+                    );
+                    
+                    try {
+                        const token = sessionStorage.getItem('token');
+                        const response = await fetch('http://localhost:8000/api/purchases/delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}` // Include JWT token
+                            },
+                            body: JSON.stringify({ ids: selectedIds })
+                        });
+                        
+                        if (response.status === 401 || response.status === 403) {
+                            alert('Session expired or unauthorized. Please log in again.');
+                            sessionStorage.removeItem('isAuthenticated');
+                            sessionStorage.removeItem('token');
+                            sessionStorage.removeItem('userRole');
+                            window.location.href = 'loginnew.html';
+                            return;
+                        }
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Failed to delete records');
+                        }
+                        
+                        // Refresh data after successful deletion
+                        await fetchPurchaseData();
+                        alert('Selected records have been deleted.');
+                    } catch (error) {
+                        console.error('Error deleting records:', error);
+                        alert('Failed to delete records. ' + error.message);
+                    }
+                }
+            });
+            
+            // Export selected functionality
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn.addEventListener('click', function() {
+                const selectedCheckboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+                
+                if (selectedCheckboxes.length === 0) {
+                    alert('Please select at least one record to export.');
+                    return;
+                }
+                
+                const selectedIds = selectedCheckboxes.map(checkbox => 
+                    checkbox.closest('tr').getAttribute('data-id')
+                );
+                
+                const selectedData = purchaseData.filter(item => selectedIds.includes(item.id));
+                
+                // Generate CSV content (including product name)
+                let csvContent = "Buyer Name,Product Name,Platform,Email,Quantity,Date,Time,GST Applicable,Total Amount,Bill\n";
+                selectedData.forEach(row => {
+                    // Escape double quotes within fields by doubling them
+                    const escapeCsv = (value) => `"${String(value).replace(/"/g, '""')}"`;
+                    csvContent += `${escapeCsv(row.buyerName)},${escapeCsv(row.productName)},${escapeCsv(row.platform)},${escapeCsv(row.email)},${escapeCsv(row.quantity)},${escapeCsv(row.date)},${escapeCsv(row.time)},${escapeCsv(row.gst)},${escapeCsv(row.amount)},${escapeCsv(row.bill)}\n`;
+                });
+                
+                // Create a download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'purchase_records_export.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+            
+            // Bill link click handler - prevent default
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('bill-link')) {
+                    e.preventDefault();
+                    const id = e.target.closest('tr').getAttribute('data-id');
+                    showDetails(id);
+                }
+            });
+            
+            // Close modal when clicking X
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Function to show details in modal
+            function showDetails(id) {
+                const data = purchaseData.find(item => item.id === id);
+                if (!data) return;
+                
+                // Populate modal fields
+                document.getElementById('detail-buyer-name').textContent = data.buyerName;
+                document.getElementById('detail-email').textContent = data.email;
+                document.getElementById('detail-product-name').textContent = data.productName;
+                document.getElementById('detail-quantity').textContent = data.quantity;
+                document.getElementById('detail-unitprice').textContent = data.unitprice;
+                document.getElementById('detail-total').textContent = data.Total;
+                document.getElementById('detail-G.total').textContent = data.grandTotal;
+                document.getElementById('detail-platform').textContent = data.platform;
+                document.getElementById('detail-quantity').textContent = data.quantity;
+                document.getElementById('detail-date').textContent = data.purchaseData;
+                document.getElementById('detail-gst').textContent = data.gst;
+                document.getElementById('detail-amount').textContent = data.amount;
+                document.getElementById('detail-bill-name').textContent = data.billUploads;
+                
+                // Show bill preview (simulated)
+                const previewContainer = document.getElementById('bill-preview-container');
+                previewContainer.innerHTML = '';
+                
+                // This part is simulated. In a real app, you'd fetch the actual bill file
+                // from a backend endpoint (e.g., /api/bills/:billName) and display it.
+                if (data.billURL === 'pdf') {
+                    previewContainer.innerHTML = '<p>PDF preview would be displayed here in a real application (e.g., using an iframe or PDF.js)</p>';
+                    // Example for a real PDF:
+                    // const iframe = document.createElement('iframe');
+                    // iframe.src = `/api/bills/${data.bill}`; // Assuming an endpoint to serve bills
+                    // iframe.style.width = '100%';
+                    // iframe.style.height = '300px';
+                    // previewContainer.appendChild(iframe);
+                } else if (data.billURL === 'image') {
+                    const img = document.createElement('img');
+                    img.src = 'path/to/your/bill_images/' + data.billUploads; // Placeholder path
+                    img.alt = 'Bill preview';
+                    previewContainer.appendChild(img);
+                } else {
+                    previewContainer.innerHTML = '<p>Document preview not available or unknown type.</p>';
+                }
+                
+                // Show modal
+                modal.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
